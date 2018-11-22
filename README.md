@@ -10,4 +10,4 @@
     
 ## Also available as DKMS-thingy ##
 
-https://github.com/EnzephaloN/ncpfs-dkms.git
+https://github.com/EnzephaloN/ncpfs_dkms.git
