@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+CVERSION=`dpkg-query -W -f='${Version}' #DRIVER_NAME#-source | awk -F "-" '{print $1}' | cut -d\: -f2`
+case "$1" in
+    remove|upgrade)
+		echo "Removing all DKMS Modules"
+		dkms remove #DRIVER_NAME#/$CVERSION --all > /dev/null || true
+		echo "Done."
+        ;;
+esac
+
+#DEBHELPER#

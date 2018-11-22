@@ -1,0 +1,23 @@
+ncpfs for Debian
+----------------
+
+Please see ./README for a description of the ncpfs software.
+
+The Debian ncpfs source package provides two packages,
+
+ 1) ncpfs, which the provides the userspace daemon
+ 2) ncpfs-source, which provides the source for the kernel modules
+
+The ncpfs-source package can be used in several ways,
+
+ - Using the make-kpkg(1) command provided by the kernel-package Debian
+   package. This will produce a corresponding ncpfs-modules package for
+   the Debian kernel-image package that you are using. This is "the Debian
+   way". See the "modules_image" section of the make-kpkg(1) man page.
+
+ - Changing to the /usr/src/modules/ncpfs/ directory and building as
+   the README file instructs using "make; make install". This will build
+   and install a module specific to the system you are building on and is
+   not under control of the packaging system.
+
+ -- EnzephaloN <info@enzephalon.de>  Tue, 20 November 2018 09:57:42 +0800

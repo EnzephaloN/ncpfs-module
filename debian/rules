@@ -1,0 +1,64 @@
+#!/usr/bin/make -f
+
+DRIVER_NAME := ncpfs
+VERSION := $(shell dpkg-parsechangelog | grep '^Version:' | cut -d' ' -f2 | cut -d- -f1 | cut -d\: -f2)
+source_package  := $(DRIVER_NAME)-source
+source_target   := usr/src/modules/$(DRIVER_NAME)
+source_debdir   := debian/$(source_package)/$(source_target)/debian
+
+ARCH := $(shell dpkg --print-architecture)
+ifeq ($(ARCH),amd64)
+ARCH_SUFFIX=x86_64
+else
+ARCH_SUFFIX=i386
+endif
+
+dkms_target     := usr/src/$(DRIVER_NAME)-$(VERSION)
+
+%:
+	dh "$@"  --with dkms
+
+install-source:
+	dh_installdirs -p $(source_package) $(source_target)
+	dh_install -p $(source_package) *.* $(source_target)/
+
+	# Copy Debian files
+	install -D -m 0755 debian/rules.modules $(source_debdir)/rules
+	for file in changelog compat control control.modules.in copyright; do \
+		install -m 644 debian/$$file $(source_debdir); \
+	done
+
+	# Make suitable tarball for module-assisant and kernel-package
+	cd debian/$(source_package)/usr/src && tar cfJ $(source_name).tar.xz modules && rm -rf modules
+
+override_dh_auto_install:
+	# just create .install files from templates.
+	for i in dkms.conf \
+		$(source_package).install \
+		$(source_package).postinst \
+		$(source_package).prerm; do \
+			sed \
+			-e "s|#DRIVER_NAME#|$(DRIVER_NAME)|" \
+			-e "s|#VERSION#|$(VERSION)|" \
+			-e "s|#ARCH#|$(ARCH_SUFFIX)|" \
+			debian/$$i.in > debian/$$i; \
+	done
+
+override_dh_clean:
+	dh_clean
+
+	for i in dkms.conf \
+		$(source_package).install \
+		$(source_package).postinst \
+		$(source_package).prerm \
+		$(source_package); do \
+			rm -f debian/$$i; \
+	done
+
+override_dh_install: install-source
+
+override_dh_dkms:
+	dh_dkms -V $(version)
+
+# do nothing
+override_dh_auto_configure override_dh_auto_build override_dh_auto_test override_dh_auto_clean:

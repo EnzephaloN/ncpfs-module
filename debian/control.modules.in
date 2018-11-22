@@ -1,0 +1,14 @@
+Source: ncpfs-nofuse
+Section: kernel
+Priority: optional
+Maintainer: Johannes C. Schulz (Enzephalon) <info@enzephalon.de>
+Build-Depends: debhelper (>= 8)
+Standards-Version: 2.2.6
+Homepage: https://github.com/
+
+Package: ncpfs-modules-_KVERS_
+Architecture: all
+Depends: linux-modules-_KVERS_
+Provides: ncpfs-modules
+Recommends: 
+Description: NCPFS module for Novell shares

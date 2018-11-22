@@ -1,0 +1,18 @@
+Source: ncpfs
+Section: kernel
+Priority: optional
+Maintainer: Johannes C. Schulz (EnzephaloN) <info@enzephalon.de>
+Build-Depends: debhelper (>= 8.0), dkms, dh-python, dh-modaliases, gcc-4.9 | gcc-5 | gcc (>= 5.3.1)
+Standards-Version: 2.2.6
+Homepage: https://github.com/
+Vcs-Browser: https://github.com/
+Vcs-Git: https://github.com/
+
+Package: ncpfs-source
+Architecture: all
+Depends: ${misc:Depends}, dkms, make, xz-utils
+XB-Modaliases: ${modaliases}
+Recommends: module-assistant
+Conflicts: ncpfs-modaliases
+Replaces: ncpfs-modaliases, ncpfs, ncpfs-kernel-source
+Description: NCPFS module for Novell shares
