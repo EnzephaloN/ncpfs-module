@@ -1,0 +1,47 @@
+--- ncpfs.iov_iter_kvec/sock.c	2019-01-23 09:53:14.169429996 +0100
++++ ncpfs/sock.c	2018-10-29 15:02:25.000000000 +0100
+@@ -39,7 +39,7 @@
+ {
+ 	struct msghdr msg = {NULL, };
+ 	struct kvec iov = {buf, size};
+-	iov_iter_kvec(&msg.msg_iter, READ | ITER_KVEC, &iov, 1, size);
++	iov_iter_kvec(&msg.msg_iter, READ , &iov, 1, size);
+ 	return sock_recvmsg(sock, &msg, flags);
+ }
+ 
+@@ -47,7 +47,7 @@
+ {
+ 	struct msghdr msg = { .msg_flags = 0 };
+ 	struct kvec vec = {.iov_base = (void *)buff, .iov_len = len};
+-	iov_iter_kvec(&msg.msg_iter, WRITE | ITER_KVEC, &vec, 1, len);
++	iov_iter_kvec(&msg.msg_iter, WRITE , &vec, 1, len);
+ 	return sock_sendmsg(sock, &msg);
+ }
+ 
+@@ -255,7 +255,7 @@
+ 		req->tx_iov[2].iov_base = req->sign;
+ 		req->tx_iov[2].iov_len = signlen;
+ 	}
+-	iov_iter_kvec(&req->from, WRITE | ITER_KVEC,
++	iov_iter_kvec(&req->from, WRITE,
+ 			req->tx_iov + 1, signlen ? 2 : 1, len + signlen);
+ 	server->rcv.creq = req;
+ 	server->timeout_last = server->m.time_out;
+@@ -285,7 +285,7 @@
+ 	/* NCP over TCP prepends signature */
+ 	req->tx_iov[0].iov_base = req->sign;
+ 	req->tx_iov[0].iov_len = signlen;
+-	iov_iter_kvec(&req->from, WRITE | ITER_KVEC,
++	iov_iter_kvec(&req->from, WRITE,
+ 			req->tx_iov, 2, len + signlen);
+ 
+ 	server->tx.creq = req;
+@@ -348,7 +348,7 @@
+ 			{.iov_base = (void *)data, .iov_len = len},
+ 		};
+ 
+-		iov_iter_kvec(&msg.msg_iter, ITER_KVEC | WRITE,
++		iov_iter_kvec(&msg.msg_iter, WRITE,
+ 				iov, 2, len + 8);
+ 
+ 		sock_sendmsg(server->info_sock, &msg);
