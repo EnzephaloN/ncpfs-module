@@ -11,3 +11,7 @@
 ## Also available as DKMS-thingy ##
 
 https://github.com/EnzephaloN/ncpfs_dkms.git
+
+## Issues
+
+Does not work with kernel above 5.1. Feel free to send me patches!
