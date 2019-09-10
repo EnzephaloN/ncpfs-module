@@ -1,17 +1,15 @@
-# NCPFS module for Linux >4.16 #
-## load as standalone-module ##
+# NCPFS module for Linux >=5.2 #
+## as a standalone module ##
 
-    git clone https://github.com/EnzephaloN/ncpfs-module.git
+    git clone https://git.enzephalon.de/enzephalon/ncpfs-module.git
     cd ncpfs-module
     make
     sudo make install
     sudo modprobe ncpfs
     sudo lsmod | grep ncpfs
-    
-## Also available as DKMS-thingy ##
+
+### for older kernels please see former commits! ###
+
+## DKMS-thingy ##
 
 https://github.com/EnzephaloN/ncpfs_dkms.git
-
-## Issues
-
-Does not work with kernel above 5.1. Feel free to send me patches!
