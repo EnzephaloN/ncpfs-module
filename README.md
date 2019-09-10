@@ -1,7 +1,7 @@
 # NCPFS module for Linux >=5.2 #
 ## as a standalone module ##
 
-    git clone https://git.enzephalon.de/enzephalon/ncpfs-module.git
+    git clone https://github.com/EnzephaloN/ncpfs-module.git
     cd ncpfs-module
     make
     sudo make install
