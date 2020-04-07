@@ -404,7 +404,7 @@ finished:
 	return val;
 }
 
-static time_t ncp_obtain_mtime(struct dentry *dentry)
+static time64_t ncp_obtain_mtime(struct dentry *dentry)
 {
 	struct inode *inode = d_inode(dentry);
 	struct ncp_server *server = NCP_SERVER(inode);
@@ -442,7 +442,7 @@ static int ncp_readdir(struct file *file, struct dir_context *ctx)
 	union  ncp_dir_cache *cache = NULL;
 	struct ncp_cache_control ctl;
 	int result, mtime_valid = 0;
-	time_t mtime = 0;
+	time64_t mtime = 0;
 
 	ctl.page  = NULL;
 	ctl.cache = NULL;

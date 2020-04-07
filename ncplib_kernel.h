@@ -186,7 +186,7 @@ ncp_new_dentry(struct dentry* dentry)
 }
 
 struct ncp_cache_head {
-	time_t		mtime;
+	time64_t		mtime;
 	unsigned long	time;	/* cache age */
 	unsigned long	end;	/* last valid fpos in cache */
 	int		eof;
