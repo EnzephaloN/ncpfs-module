@@ -1,4 +1,4 @@
-# NCPFS module for Linux >=4.18 #
+# NCPFS module for Linux >=5.6 #
 ## use master-branch for current kernel >= 5.2 ##
 ### as a standalone module ###
 
