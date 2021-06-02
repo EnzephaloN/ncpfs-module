@@ -32,6 +32,7 @@
 #include <linux/seq_file.h>
 #include <linux/sched/signal.h>
 #include <linux/namei.h>
+#include <linux/version.h>
 
 #include <net/sock.h>
 
@@ -858,7 +859,7 @@ dflt:;
 	return 0;
 }
 
-int ncp_notify_change(struct dentry *dentry, struct iattr *attr)
+int ncp_notify_change(struct user_namespace *mnt_userns, struct dentry *dentry, struct iattr *attr)
 {
 	struct inode *inode = d_inode(dentry);
 	int result = 0;
@@ -879,7 +880,7 @@ int ncp_notify_change(struct dentry *dentry, struct iattr *attr)
 	/* ageing the dentry to force validation */
 	ncp_age_dentry(server, dentry);
 
-	result = setattr_prepare(dentry, attr);
+	result = setattr_prepare(mnt_userns, dentry, attr);
 	if (result < 0)
 		goto out;
 
@@ -941,7 +942,7 @@ int ncp_notify_change(struct dentry *dentry, struct iattr *attr)
 				tmpattr.ia_valid = ATTR_MODE;
 				tmpattr.ia_mode = attr->ia_mode;
 
-				setattr_copy(inode, &tmpattr);
+				setattr_copy(mnt_userns, inode, &tmpattr);
 				mark_inode_dirty(inode);
 			}
 		}
@@ -1013,7 +1014,7 @@ int ncp_notify_change(struct dentry *dentry, struct iattr *attr)
 	if (result)
 		goto out;
 
-	setattr_copy(inode, attr);
+	setattr_copy(mnt_userns, inode, attr);
 	mark_inode_dirty(inode);
 
 out:

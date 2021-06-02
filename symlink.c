@@ -30,6 +30,7 @@
 #include <linux/slab.h>
 #include <linux/mm.h>
 #include <linux/stat.h>
+#include <linux/version.h>
 #include "ncp_fs.h"
 
 /* these magic numbers must appear in the symlink file -- this makes it a bit
@@ -104,7 +105,7 @@ const struct address_space_operations ncp_symlink_aops = {
 	
 /* ----- create a new symbolic link -------------------------------------- */
  
-int ncp_symlink(struct inode *dir, struct dentry *dentry, const char *symname) {
+int ncp_symlink(struct user_namespace *mnt_userns, struct inode *dir, struct dentry *dentry, const char *symname) {
 	struct inode *inode;
 	char *rawlink;
 	int length, err, i, outlen;

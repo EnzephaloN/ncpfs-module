@@ -874,7 +874,7 @@ long ncp_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			if (ret)
 				goto out;
 			need_drop_write = 1;
-			ret = inode_permission(inode, MAY_WRITE);
+			ret = inode_permission(&init_user_ns, inode, MAY_WRITE);
 			if (ret)
 				goto outDropWrite;
 			break;
@@ -886,7 +886,7 @@ long ncp_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		case NCP_IOC_GETMOUNTUID64:
 		case NCP_IOC_GETROOT:
 		case NCP_IOC_SIGN_WANTED:
-			ret = inode_permission(inode, MAY_READ);
+			ret = inode_permission(&init_user_ns, inode, MAY_WRITE);
 			if (ret)
 				goto out;
 			break;

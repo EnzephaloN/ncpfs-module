@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <linux/ncp_fs.h>
+#include <linux/version.h>
 #include "ncp_fs_i.h"
 #include "ncp_fs_sb.h"
 
@@ -53,7 +54,7 @@ static inline struct ncp_inode_info *NCP_FINFO(const struct inode *inode)
 }
 
 /* linux/fs/ncpfs/inode.c */
-int ncp_notify_change(struct dentry *, struct iattr *);
+int ncp_notify_change(struct user_namespace *mnt_userns, struct dentry *, struct iattr *);
 struct inode *ncp_iget(struct super_block *, struct ncp_entry_info *);
 void ncp_update_inode(struct inode *, struct ncp_entry_info *);
 void ncp_update_inode2(struct inode *, struct ncp_entry_info *);
@@ -84,7 +85,7 @@ void ncp_unlock_server(struct ncp_server *server);
 /* linux/fs/ncpfs/symlink.c */
 #if defined(CONFIG_NCPFS_EXTRAS) || defined(CONFIG_NCPFS_NFS_NS)
 extern const struct address_space_operations ncp_symlink_aops;
-int ncp_symlink(struct inode*, struct dentry*, const char*);
+int ncp_symlink(struct user_namespace *mnt_userns, struct inode*, struct dentry*, const char*);
 #endif
 
 /* linux/fs/ncpfs/file.c */
