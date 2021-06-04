@@ -39,7 +39,7 @@ static int _recv(struct socket *sock, void *buf, int size, unsigned flags)
 {
 	struct msghdr msg = {NULL, };
 	struct kvec iov = {buf, size};
-	iov_iter_kvec(&msg.msg_iter, READ | ITER_KVEC, &iov, 1, size);
+	iov_iter_kvec(&msg.msg_iter, READ, &iov, 1, size);
 	return sock_recvmsg(sock, &msg, flags);
 }
 
@@ -47,7 +47,7 @@ static int _send(struct socket *sock, const void *buff, int len)
 {
 	struct msghdr msg = { .msg_flags = 0 };
 	struct kvec vec = {.iov_base = (void *)buff, .iov_len = len};
-	iov_iter_kvec(&msg.msg_iter, WRITE | ITER_KVEC, &vec, 1, len);
+	iov_iter_kvec(&msg.msg_iter, WRITE, &vec, 1, len);
 	return sock_sendmsg(sock, &msg);
 }
 
@@ -255,7 +255,7 @@ static void ncpdgram_start_request(struct ncp_server *server, struct ncp_request
 		req->tx_iov[2].iov_base = req->sign;
 		req->tx_iov[2].iov_len = signlen;
 	}
-	iov_iter_kvec(&req->from, WRITE | ITER_KVEC,
+	iov_iter_kvec(&req->from, WRITE,
 			req->tx_iov + 1, signlen ? 2 : 1, len + signlen);
 	server->rcv.creq = req;
 	server->timeout_last = server->m.time_out;
@@ -285,7 +285,7 @@ static void ncptcp_start_request(struct ncp_server *server, struct ncp_request_r
 	/* NCP over TCP prepends signature */
 	req->tx_iov[0].iov_base = req->sign;
 	req->tx_iov[0].iov_len = signlen;
-	iov_iter_kvec(&req->from, WRITE | ITER_KVEC,
+	iov_iter_kvec(&req->from, WRITE,
 			req->tx_iov, 2, len + signlen);
 
 	server->tx.creq = req;
@@ -348,7 +348,7 @@ static void info_server(struct ncp_server *server, unsigned int id, const void *
 			{.iov_base = (void *)data, .iov_len = len},
 		};
 
-		iov_iter_kvec(&msg.msg_iter, ITER_KVEC | WRITE,
+		iov_iter_kvec(&msg.msg_iter, WRITE,
 				iov, 2, len + 8);
 
 		sock_sendmsg(server->info_sock, &msg);
