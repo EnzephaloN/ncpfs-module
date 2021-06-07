@@ -13,9 +13,9 @@ Because the kernel dropped support for NCPFS with 4.18, we try to keep this as m
     sudo lsmod | grep ncpfs
 
 ### for older kernels please see branches! ###
-https://github.com/EnzephaloN/ncpfs-module/tree/kernel_4.18
 https://github.com/EnzephaloN/ncpfs-module/tree/kernel_4.19
 https://github.com/EnzephaloN/ncpfs-module/tree/kernel_4.20
+https://github.com/EnzephaloN/ncpfs-module/tree/kernel_5.2
 https://github.com/EnzephaloN/ncpfs-module/tree/kernel_5.6
 
 
