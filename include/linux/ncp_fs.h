@@ -14,7 +14,6 @@
 #include <linux/types.h>
 #include <linux/magic.h>
 
-#include <linux/ipx.h>
 #include <linux/ncp_no.h>
 
 /*
@@ -29,7 +28,6 @@ struct ncp_ioctl_request {
 
 struct ncp_fs_info {
 	int version;
-	struct sockaddr_ipx addr;
 	__kernel_uid_t mounted_uid;
 	int connection;		/* Connection number the server assigned us */
 	int buffer_size;	/* The negotiated buffer size, to be
