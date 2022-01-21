@@ -27,7 +27,6 @@
 #include <linux/slab.h>
 #include <net/scm.h>
 #include <net/sock.h>
-#include <linux/ipx.h>
 #include <linux/poll.h>
 #include <linux/file.h>
 
