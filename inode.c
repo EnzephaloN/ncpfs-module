@@ -191,7 +191,7 @@ static void ncp_update_attrs(struct inode *inode, struct ncp_entry_info *nwinfo)
 							break;
 						}
 					}
-					/* FALLTHROUGH */
+					NCPFS_FALLTHROUGH;
 				case 0:
 					if (server->m.flags & NCP_MOUNT_EXTRAS)
 						inode->i_mode |= S_IRUGO;

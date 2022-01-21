@@ -637,6 +637,7 @@ skipdata:;
 				ncp_finish_request(server, req, req->datalen);
 			nextreq:;
 				__ncp_next_request(server);
+				NCPFS_FALLTHROUGH;
 			case 2:
 			next:;
 				server->rcv.ptr = (unsigned char*)&server->rcv.buf;

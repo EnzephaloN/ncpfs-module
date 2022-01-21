@@ -32,6 +32,11 @@ do {								\
 
 #define NCP_MAX_RPC_TIMEOUT (6*HZ)
 
+#if __has_attribute(__fallthrough__)
+#define NCPFS_FALLTHROUGH __attribute__((__fallthrough__))
+#else
+#define NCPFS_FALLTHROUGH do {} while(0)
+#endif
 
 struct ncp_entry_info {
 	struct nw_info_struct	i;
