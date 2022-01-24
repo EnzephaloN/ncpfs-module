@@ -404,7 +404,7 @@ finished:
 	return val;
 }
 
-static time_t ncp_obtain_mtime(struct dentry *dentry)
+static time64_t ncp_obtain_mtime(struct dentry *dentry)
 {
 	struct inode *inode = d_inode(dentry);
 	struct ncp_server *server = NCP_SERVER(inode);
