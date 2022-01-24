@@ -442,7 +442,7 @@ static int ncp_readdir(struct file *file, struct dir_context *ctx)
 	union  ncp_dir_cache *cache = NULL;
 	struct ncp_cache_control ctl;
 	int result, mtime_valid = 0;
-	time_t mtime = 0;
+	time64_t mtime = 0;
 
 	ctl.page  = NULL;
 	ctl.cache = NULL;
