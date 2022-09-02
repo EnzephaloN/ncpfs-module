@@ -84,6 +84,15 @@ static int ncp_symlink_read_folio(struct file *file, struct folio *folio)
 	folio_mark_uptodate(folio);
 	kunmap(&folio->page);
 	folio_unlock(folio);
+	return 0;
+
+failEIO:
+	error = -EIO;
+	kfree(rawlink);
+fail:
+	folio_set_error(folio);
+	kunmap(&folio->page);
+	folio_unlock(folio);
 	return error;
 }
 
