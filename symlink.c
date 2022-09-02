@@ -41,12 +41,12 @@
 
 /* ----- read a symbolic link ------------------------------------------ */
 
-static int ncp_symlink_readpage(struct file *file, struct page *page)
+static int ncp_symlink_read_folio(struct file *file, struct folio *folio)
 {
-	struct inode *inode = page->mapping->host;
+	struct inode *inode = folio->mapping->host;
 	int error, length, len;
 	char *link, *rawlink;
-	char *buf = kmap(page);
+	char *buf = kmap(&folio->page);
 
 	error = -ENOMEM;
 	rawlink = kmalloc(NCP_MAX_SYMLINK_SIZE, GFP_KERNEL);
@@ -81,18 +81,9 @@ static int ncp_symlink_readpage(struct file *file, struct page *page)
 	kfree(rawlink);
 	if (error)
 		goto fail;
-	SetPageUptodate(page);
-	kunmap(page);
-	unlock_page(page);
-	return 0;
-
-failEIO:
-	error = -EIO;
-	kfree(rawlink);
-fail:
-	SetPageError(page);
-	kunmap(page);
-	unlock_page(page);
+	folio_mark_uptodate(folio);
+	kunmap(&folio->page);
+	folio_unlock(folio);
 	return error;
 }
 
@@ -100,11 +91,11 @@ fail:
  * symlinks can't do much...
  */
 const struct address_space_operations ncp_symlink_aops = {
-	.readpage	= ncp_symlink_readpage,
+	.read_folio = ncp_symlink_read_folio,
 };
-	
+
 /* ----- create a new symbolic link -------------------------------------- */
- 
+
 int ncp_symlink(struct user_namespace *mnt_userns, struct inode *dir, struct dentry *dentry, const char *symname) {
 	struct inode *inode;
 	char *rawlink;
