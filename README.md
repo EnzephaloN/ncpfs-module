@@ -1,7 +1,7 @@
 # NCPFS module for Linux >= 4.18 #
 Because the kernel dropped support for NCPFS with 4.18, we try to keep this as module alive.
 
-## master-branch for Kernel >= 5.18 ##
+## master-branch for Kernel >= 5.19 ##
 
 ### as a standalone module ###
 
