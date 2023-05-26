@@ -859,7 +859,7 @@ dflt:;
 	return 0;
 }
 
-int ncp_notify_change(struct user_namespace *mnt_userns, struct dentry *dentry, struct iattr *attr)
+int ncp_notify_change(struct mnt_idmap *idmap, struct dentry *dentry, struct iattr *attr)
 {
 	struct inode *inode = d_inode(dentry);
 	int result = 0;
@@ -880,7 +880,7 @@ int ncp_notify_change(struct user_namespace *mnt_userns, struct dentry *dentry, 
 	/* ageing the dentry to force validation */
 	ncp_age_dentry(server, dentry);
 
-	result = setattr_prepare(mnt_userns, dentry, attr);
+	result = setattr_prepare(idmap, dentry, attr);
 	if (result < 0)
 		goto out;
 
@@ -942,7 +942,7 @@ int ncp_notify_change(struct user_namespace *mnt_userns, struct dentry *dentry, 
 				tmpattr.ia_valid = ATTR_MODE;
 				tmpattr.ia_mode = attr->ia_mode;
 
-				setattr_copy(mnt_userns, inode, &tmpattr);
+				setattr_copy(idmap, inode, &tmpattr);
 				mark_inode_dirty(inode);
 			}
 		}
@@ -1014,7 +1014,7 @@ int ncp_notify_change(struct user_namespace *mnt_userns, struct dentry *dentry, 
 	if (result)
 		goto out;
 
-	setattr_copy(mnt_userns, inode, attr);
+	setattr_copy(idmap, inode, attr);
 	mark_inode_dirty(inode);
 
 out:

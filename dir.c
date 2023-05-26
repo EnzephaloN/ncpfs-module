@@ -31,17 +31,17 @@ static void ncp_do_readdir(struct file *, struct dir_context *,
 
 static int ncp_readdir(struct file *, struct dir_context *);
 
-static int ncp_create(struct user_namespace *mnt_userns, struct inode *, struct dentry *, umode_t, bool);
-static int ncp_mkdir(struct user_namespace *mnt_userns, struct inode *, struct dentry *, umode_t);
-static int ncp_rename(struct user_namespace *mnt_userns, struct inode *, struct dentry *,
+static int ncp_create(struct mnt_idmap *idmap, struct inode *, struct dentry *, umode_t, bool);
+static int ncp_mkdir(struct mnt_idmap *idmap, struct inode *, struct dentry *, umode_t);
+static int ncp_rename(struct mnt_idmap *idmap, struct inode *, struct dentry *,
 		      struct inode *, struct dentry *, unsigned int);
-static int ncp_mknod(struct user_namespace *mnt_userns, struct inode * dir, struct dentry *dentry,
- 		     umode_t mode, dev_t rdev);
+static int ncp_mknod(struct mnt_idmap *idmap, struct inode * dir, struct dentry *dentry,
+		     umode_t mode, dev_t rdev);
 static struct dentry *ncp_lookup(struct inode *, struct dentry *, unsigned int);
 static int ncp_unlink(struct inode *, struct dentry *);
 static int ncp_rmdir(struct inode *, struct dentry *);
 #if defined(CONFIG_NCPFS_EXTRAS) || defined(CONFIG_NCPFS_NFS_NS)
-extern int ncp_symlink(struct user_namespace *mnt_userns, struct inode *, struct dentry *, const char *);
+extern int ncp_symlink(struct mnt_idmap *idmap, struct inode *, struct dentry *, const char *);
 #else
 #define ncp_symlink NULL
 #endif
@@ -983,13 +983,12 @@ out:
 	return error;
 }
 
-static int ncp_create(struct user_namespace *mnt_userns, struct inode *dir, struct dentry *dentry, umode_t mode,
-		bool excl)
+static int ncp_create(struct mnt_idmap *idmap, struct inode *dir, struct dentry *dentry, umode_t mode, bool excl)
 {
 	return ncp_create_new(dir, dentry, mode, 0, 0);
 }
 
-static int ncp_mkdir(struct user_namespace *mnt_userns, struct inode *dir, struct dentry *dentry, umode_t mode)
+static int ncp_mkdir(struct mnt_idmap *idmap, struct inode *dir, struct dentry *dentry, umode_t mode)
 {
 	struct ncp_entry_info finfo;
 	struct ncp_server *server = NCP_SERVER(dir);
@@ -1123,7 +1122,7 @@ static int ncp_unlink(struct inode *dir, struct dentry *dentry)
 	return error;
 }
 
-static int ncp_rename(struct user_namespace *mnt_userns, struct inode *old_dir, struct dentry *old_dentry,
+static int ncp_rename(struct mnt_idmap *idmap, struct inode *old_dir, struct dentry *old_dentry,
 		      struct inode *new_dir, struct dentry *new_dentry,
 		      unsigned int flags)
 {
@@ -1184,7 +1183,7 @@ out:
 	return error;
 }
 
-static int ncp_mknod(struct user_namespace *mnt_userns, struct inode * dir, struct dentry *dentry,
+static int ncp_mknod(struct mnt_idmap *idmap, struct inode * dir, struct dentry *dentry,
 		     umode_t mode, dev_t rdev)
 {
 	if (ncp_is_nfs_extras(NCP_SERVER(dir), NCP_FINFO(dir)->volNumber)) {
