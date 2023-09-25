@@ -50,7 +50,7 @@ const struct file_operations ncp_dir_operations =
 {
 	.llseek		= generic_file_llseek,
 	.read		= generic_read_dir,
-	.iterate	= ncp_readdir,
+	.iterate_shared	= ncp_readdir,
 	.unlocked_ioctl	= ncp_ioctl,
 #ifdef CONFIG_COMPAT
 	.compat_ioctl	= ncp_compat_ioctl,
