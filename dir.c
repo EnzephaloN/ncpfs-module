@@ -426,7 +426,7 @@ ncp_invalidate_dircache_entries(struct dentry *parent)
 	struct dentry *dentry;
 
 	spin_lock(&parent->d_lock);
-	list_for_each_entry(dentry, &parent->d_subdirs, d_child) {
+	hlist_for_each_entry(dentry, &parent->d_children, d_sib) {
 		dentry->d_fsdata = NULL;
 		ncp_age_dentry(server, dentry);
 	}
