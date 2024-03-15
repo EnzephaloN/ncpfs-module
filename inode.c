@@ -154,12 +154,9 @@ static void ncp_update_dates(struct inode *inode, struct nw_info_struct *nwi)
 
 	inode->i_blocks = (i_size_read(inode) + NCP_BLOCK_SIZE - 1) >> NCP_BLOCK_SHIFT;
 
-	inode->i_mtime.tv_sec = ncp_date_dos2unix(nwi->modifyTime, nwi->modifyDate);
+	inode_set_mtime(inode, ncp_date_dos2unix(nwi->modifyTime, nwi->modifyDate), 0);
 	inode_set_ctime(inode, ncp_date_dos2unix(nwi->creationTime, nwi->creationDate), 0);
-	inode->i_atime.tv_sec = ncp_date_dos2unix(0, nwi->lastAccessDate);
-	inode->i_atime.tv_nsec = 0;
-	inode->i_mtime.tv_nsec = 0;
-	inode_set_ctime(inode, 0, 0);
+	inode_set_atime(inode, ncp_date_dos2unix(0, nwi->lastAccessDate), 0);
 }
 
 static void ncp_update_attrs(struct inode *inode, struct ncp_entry_info *nwinfo)
