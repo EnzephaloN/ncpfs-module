@@ -1,7 +1,7 @@
 # NCPFS module for Linux >= 4.18 #
 Because the kernel dropped support for NCPFS with 4.18, we try to keep this as module alive.
 
-## master-branch for Kernel >= 6.8 ##
+## master-branch for Kernel >= 6.9 ##
 
 > [!CAUTION]
 > It may not be a good idea to always run the latest kernel AND require ncpfs. Our patches for ncpfs are always delayed!
@@ -27,6 +27,7 @@ Because the kernel dropped support for NCPFS with 4.18, we try to keep this as m
 - Kernel 6.3 - 6.4 : https://github.com/EnzephaloN/ncpfs-module/tree/kernel_6.3
 - Kernel 6.5 - 6.5 : https://github.com/EnzephaloN/ncpfs-module/tree/kernel_6.5
 - Kernel 6.6 - 6.7 : https://github.com/EnzephaloN/ncpfs-module/tree/kernel_6.6
+- Kernel 6.8 : https://github.com/EnzephaloN/ncpfs-module/tree/kernel_6.8
 
 ### DKMS-thingy ###
 
