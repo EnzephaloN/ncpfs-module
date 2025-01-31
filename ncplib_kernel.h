@@ -24,7 +24,7 @@
 
 #include <linux/uaccess.h>
 #include <asm/byteorder.h>
-#include <asm/unaligned.h>
+#include <linux/unaligned.h>
 #include <asm/string.h>
 
 #ifdef CONFIG_NCPFS_NLS
