@@ -32,7 +32,7 @@ static void ncp_do_readdir(struct file *, struct dir_context *,
 static int ncp_readdir(struct file *, struct dir_context *);
 
 static int ncp_create(struct mnt_idmap *idmap, struct inode *, struct dentry *, umode_t, bool);
-static int ncp_mkdir(struct mnt_idmap *idmap, struct inode *, struct dentry *, umode_t);
+static struct dentry *ncp_mkdir(struct mnt_idmap *idmap, struct inode *, struct dentry *, umode_t);
 static int ncp_rename(struct mnt_idmap *idmap, struct inode *, struct dentry *,
 		      struct inode *, struct dentry *, unsigned int);
 static int ncp_mknod(struct mnt_idmap *idmap, struct inode * dir, struct dentry *dentry,
@@ -100,7 +100,7 @@ EXPORT_SYMBOL(new_dentry_update_name_case);
 /*
  * Dentry operations routines
  */
-static int ncp_lookup_validate(struct dentry *, unsigned int);
+static int ncp_lookup_validate(struct inode *parent_dir, const struct qstr *name, struct dentry *, unsigned int);
 static int ncp_hash_dentry(const struct dentry *, struct qstr *);
 static int ncp_compare_dentry(const struct dentry *,
 		unsigned int, const char *, const struct qstr *);
@@ -326,7 +326,7 @@ leave_me:;
 
 
 static int
-ncp_lookup_validate(struct dentry *dentry, unsigned int flags)
+ncp_lookup_validate(struct inode *parent_dir, const struct qstr *name, struct dentry *dentry, unsigned int flags)
 {
 	struct ncp_server *server;
 	struct dentry *parent;
@@ -988,7 +988,7 @@ static int ncp_create(struct mnt_idmap *idmap, struct inode *dir, struct dentry 
 	return ncp_create_new(dir, dentry, mode, 0, 0);
 }
 
-static int ncp_mkdir(struct mnt_idmap *idmap, struct inode *dir, struct dentry *dentry, umode_t mode)
+static struct dentry *ncp_mkdir(struct mnt_idmap *idmap, struct inode *dir, struct dentry *dentry, umode_t mode)
 {
 	struct ncp_entry_info finfo;
 	struct ncp_server *server = NCP_SERVER(dir);
@@ -1023,7 +1023,7 @@ static int ncp_mkdir(struct mnt_idmap *idmap, struct inode *dir, struct dentry *
 		error = -EACCES;
 	}
 out:
-	return error;
+	return ERR_PTR(error);
 }
 
 static int ncp_rmdir(struct inode *dir, struct dentry *dentry)

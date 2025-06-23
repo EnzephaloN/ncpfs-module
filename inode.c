@@ -317,7 +317,7 @@ static void ncp_stop_tasks(struct ncp_server *server) {
 	sk->sk_data_ready   = server->data_ready;
 	sk->sk_write_space  = server->write_space;
 	release_sock(sk);
-	del_timer_sync(&server->timeout_tm);
+	timer_delete_sync(&server->timeout_tm);
 
 	flush_work(&server->rcv.tq);
 	if (sk->sk_socket->type == SOCK_STREAM)

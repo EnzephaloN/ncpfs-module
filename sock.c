@@ -139,10 +139,10 @@ static void __abort_ncp_connection(struct ncp_server *server)
 	struct ncp_request_reply *req;
 
 	ncp_invalidate_conn(server);
-	del_timer(&server->timeout_tm);
+	timer_delete(&server->timeout_tm);
 	while (!list_empty(&server->tx.requests)) {
 		req = list_entry(server->tx.requests.next, struct ncp_request_reply, req);
-		
+
 		list_del_init(&req->req);
 		ncp_finish_request(server, req, -EIO);
 	}
@@ -420,7 +420,7 @@ void ncpdgram_rcv_proc(struct work_struct *work)
 							result = -EIO;
 						} else {
 							unsigned int hdrl;
-							
+
 							result -= 8;
 							hdrl = sock->sk->sk_family == AF_INET ? 8 : 6;
 							if (sign_verify_reply(server, server->rxbuf + hdrl, result - hdrl, cpu_to_le32(result), server->rxbuf + result)) {
@@ -430,7 +430,7 @@ void ncpdgram_rcv_proc(struct work_struct *work)
 						}
 					}
 #endif
-					del_timer(&server->timeout_tm);
+					timer_delete(&server->timeout_tm);
 				     	server->rcv.creq = NULL;
 					ncp_finish_request(server, req, result);
 					__ncp_next_request(server);
