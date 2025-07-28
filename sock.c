@@ -101,7 +101,7 @@ void ncp_tcp_data_ready(struct sock *sk)
 void ncp_tcp_error_report(struct sock *sk)
 {
 	struct ncp_server *server = sk->sk_user_data;
-	
+
 	server->error_report(sk);
 	schedule_work(&server->rcv.tq);
 }
@@ -109,7 +109,7 @@ void ncp_tcp_error_report(struct sock *sk)
 void ncp_tcp_write_space(struct sock *sk)
 {
 	struct ncp_server *server = sk->sk_user_data;
-	
+
 	/* We do not need any locking: we first set tx.creq, and then we do sendmsg,
 	   not vice versa... */
 	server->write_space(sk);
@@ -119,7 +119,7 @@ void ncp_tcp_write_space(struct sock *sk)
 
 void ncpdgram_timeout_call(struct timer_list *t)
 {
-	struct ncp_server *server = from_timer(server, t, timeout_tm);
+    struct ncp_server *server = timer_container_of(server, t, timeout_tm);
 
 	schedule_work(&server->timeout_tq);
 }
@@ -238,15 +238,15 @@ static inline void ncp_init_header(struct ncp_server *server, struct ncp_request
 	h->conn_high = server->connection >> 8;
 	h->sequence = ++server->sequence;
 }
-	
+
 static void ncpdgram_start_request(struct ncp_server *server, struct ncp_request_reply *req)
 {
 	size_t signlen, len = req->tx_iov[1].iov_len;
 	struct ncp_request_header *h = req->tx_iov[1].iov_base;
-	
+
 	ncp_init_header(server, req, h);
 	signlen = sign_packet(server,
-			req->tx_iov[1].iov_base + sizeof(struct ncp_request_header) - 1, 
+			req->tx_iov[1].iov_base + sizeof(struct ncp_request_header) - 1,
 			len - sizeof(struct ncp_request_header) + 1,
 			cpu_to_le32(len), req->sign);
 	if (signlen) {
@@ -359,9 +359,9 @@ void ncpdgram_rcv_proc(struct work_struct *work)
 	struct ncp_server *server =
 		container_of(work, struct ncp_server, rcv.tq);
 	struct socket* sock;
-	
+
 	sock = server->ncp_sock;
-	
+
 	while (1) {
 		struct ncp_reply_header reply;
 		int result;
@@ -372,7 +372,7 @@ void ncpdgram_rcv_proc(struct work_struct *work)
 		}
 		if (result >= sizeof(reply)) {
 			struct ncp_request_reply *req;
-	
+
 			if (reply.type == NCP_WATCHDOG) {
 				unsigned char buf[10];
 
@@ -406,7 +406,7 @@ void ncpdgram_rcv_proc(struct work_struct *work)
 			}
 			mutex_lock(&server->rcv.creq_mutex);
 			req = server->rcv.creq;
-			if (req && (req->tx_type == NCP_ALLOC_SLOT_REQUEST || (server->sequence == reply.sequence && 
+			if (req && (req->tx_type == NCP_ALLOC_SLOT_REQUEST || (server->sequence == reply.sequence &&
 					server->connection == get_conn_number(&reply)))) {
 				if (reply.type == NCP_POSITIVE_ACK) {
 					server->timeout_retries = server->m.retry_count;
@@ -440,7 +440,7 @@ void ncpdgram_rcv_proc(struct work_struct *work)
 			}
 			mutex_unlock(&server->rcv.creq_mutex);
 		}
-drop:;		
+drop:;
 		_recv(sock, &reply, sizeof(reply), MSG_DONTWAIT);
 	}
 }
@@ -450,11 +450,11 @@ static void __ncpdgram_timeout_proc(struct ncp_server *server)
 	/* If timer is pending, we are processing another request... */
 	if (!timer_pending(&server->timeout_tm)) {
 		struct ncp_request_reply* req;
-		
+
 		req = server->rcv.creq;
 		if (req) {
 			int timeout;
-			
+
 			if (server->m.flags & NCP_MOUNT_SOFT) {
 				if (server->timeout_retries-- == 0) {
 					__ncp_abort_request(server, req, -ETIMEDOUT);
@@ -485,12 +485,12 @@ void ncpdgram_timeout_proc(struct work_struct *work)
 static int do_tcp_rcv(struct ncp_server *server, void *buffer, size_t len)
 {
 	int result;
-	
+
 	if (buffer) {
 		result = _recv(server->ncp_sock, buffer, len, MSG_DONTWAIT);
 	} else {
 		static unsigned char dummy[1024];
-			
+
 		if (len > sizeof(dummy)) {
 			len = sizeof(dummy);
 		}
@@ -501,10 +501,10 @@ static int do_tcp_rcv(struct ncp_server *server, void *buffer, size_t len)
 	}
 	if (result > len) {
 		pr_err("tcp: bug in recvmsg (%u > %zu)\n", result, len);
-		return -EIO;			
+		return -EIO;
 	}
 	return result;
-}	
+}
 
 static int __ncptcp_rcv_proc(struct ncp_server *server)
 {
@@ -552,7 +552,7 @@ static int __ncptcp_rcv_proc(struct ncp_server *server)
 					__ncptcp_abort(server);
 					return -EIO;
 				}
-#ifdef CONFIG_NCPFS_PACKET_SIGNING				
+#ifdef CONFIG_NCPFS_PACKET_SIGNING
 				if (server->sign_active) {
 					if (datalen < 18) {
 						pr_err("tcp: Unexpected reply len %d\n", datalen);
@@ -565,10 +565,10 @@ static int __ncptcp_rcv_proc(struct ncp_server *server)
 					server->rcv.state = 4;
 					break;
 				}
-#endif				
+#endif
 				type = ntohs(server->rcv.buf.type);
-#ifdef CONFIG_NCPFS_PACKET_SIGNING				
-cont:;				
+#ifdef CONFIG_NCPFS_PACKET_SIGNING
+cont:;
 #endif
 				if (type != NCP_REPLY) {
 					if (datalen - 8 <= sizeof(server->unexpected_packet.data)) {
@@ -579,7 +579,7 @@ cont:;
 						server->rcv.ptr = server->unexpected_packet.data + 2;
 						server->rcv.len = datalen - 10;
 						break;
-					}					
+					}
 					ncp_dbg(1, "tcp: Unexpected NCP type %02X\n", type);
 skipdata2:;
 					server->rcv.state = 2;
@@ -604,7 +604,7 @@ skipdata:;
 				server->rcv.len = datalen - 10;
 				server->rcv.state = 1;
 				break;
-#ifdef CONFIG_NCPFS_PACKET_SIGNING				
+#ifdef CONFIG_NCPFS_PACKET_SIGNING
 			case 4:
 				datalen = server->rcv.buf.len;
 				type = ntohs(server->rcv.buf.type2);
@@ -624,7 +624,7 @@ skipdata:;
 						return -EIO;
 					}
 				}
-#ifdef CONFIG_NCPFS_PACKET_SIGNING				
+#ifdef CONFIG_NCPFS_PACKET_SIGNING
 				if (server->sign_active && req->tx_type != NCP_DEALLOC_SLOT_REQUEST) {
 					if (sign_verify_reply(server, server->rxbuf + 6, req->datalen - 6, cpu_to_be32(req->datalen + 16), &server->rcv.buf.type)) {
 						pr_err("tcp: Signature violation\n");
@@ -632,7 +632,7 @@ skipdata:;
 						return -EIO;
 					}
 				}
-#endif				
+#endif
 				ncp_finish_request(server, req, req->datalen);
 			nextreq:;
 				__ncp_next_request(server);
@@ -667,7 +667,7 @@ void ncp_tcp_tx_proc(struct work_struct *work)
 {
 	struct ncp_server *server =
 		container_of(work, struct ncp_server, tx.tq);
-	
+
 	mutex_lock(&server->rcv.creq_mutex);
 	__ncptcp_try_send(server);
 	mutex_unlock(&server->rcv.creq_mutex);
@@ -747,7 +747,7 @@ static int ncp_do_request(struct ncp_server *server, int size,
 		siginitsetinv(&current->blocked, mask);
 		recalc_sigpending();
 		spin_unlock_irqrestore(&current->sighand->siglock, flags);
-		
+
 		result = do_ncp_rpc_call(server, size, reply, max_reply_size);
 
 		spin_lock_irqsave(&current->sighand->siglock, flags);
@@ -765,7 +765,7 @@ static int ncp_do_request(struct ncp_server *server, int size,
  * received. It assumes that server->current_size contains the ncp
  * request size
  */
-int ncp_request2(struct ncp_server *server, int function, 
+int ncp_request2(struct ncp_server *server, int function,
 		void* rpl, int size)
 {
 	struct ncp_request_header *h;

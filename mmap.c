@@ -23,6 +23,12 @@
 
 #include "ncp_fs.h"
 
+inline void count_memcg_events(struct mem_cgroup *memcg,
+                                        enum vm_event_item idx,
+                                        unsigned long count)
+{
+}
+
 /*
  * Fill in the supplied page for mmap
  * XXX: how are we excluding truncate/invalidate here? Maybe need to lock
@@ -104,7 +110,7 @@ static const struct vm_operations_struct ncp_file_mmap =
 int ncp_mmap(struct file *file, struct vm_area_struct *vma)
 {
 	struct inode *inode = file_inode(file);
-	
+
 	ncp_dbg(1, "called\n");
 
 	if (!ncp_conn_valid(NCP_SERVER(inode)))
@@ -113,7 +119,7 @@ int ncp_mmap(struct file *file, struct vm_area_struct *vma)
 	/* only PAGE_COW or read-only supported now */
 	if (vma->vm_flags & VM_SHARED)
 		return -EINVAL;
-	/* we do not support files bigger than 4GB... We eventually 
+	/* we do not support files bigger than 4GB... We eventually
 	   supports just 4GB... */
 	if (vma_pages(vma) + vma->vm_pgoff
 	   > (1U << (32 - PAGE_SHIFT)))
