@@ -27,7 +27,7 @@
 #include <linux/slab.h>
 #include <linux/vmalloc.h>
 #include <linux/init.h>
-#include <linux/vfs.h>
+#include <linux/fs.h>
 #include <linux/mount.h>
 #include <linux/seq_file.h>
 #include <linux/sched/signal.h>
@@ -113,7 +113,7 @@ static const struct super_operations ncp_sops =
 {
 	.alloc_inode	= ncp_alloc_inode,
 	.destroy_inode	= ncp_destroy_inode,
-	.drop_inode	= generic_delete_inode,
+	.drop_inode	= inode_generic_drop,
 	.evict_inode	= ncp_evict_inode,
 	.put_super	= ncp_put_super,
 	.statfs		= ncp_statfs,
@@ -1023,7 +1023,7 @@ out:
 static struct dentry *ncp_mount(struct file_system_type *fs_type,
 	int flags, const char *dev_name, void *data)
 {
-	return mount_nodev(fs_type, flags, data, ncp_fill_super);
+	return ncp_mount_nodev(fs_type, flags, data, ncp_fill_super);
 }
 
 static struct file_system_type ncp_fs_type = {

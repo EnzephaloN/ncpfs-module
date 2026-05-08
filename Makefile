@@ -57,11 +57,11 @@ help:
 install: ncpfs.ko
 	rm -f ${MDIR}/kernel/drivers/staging/ncpfs/ncpfs.ko
 	install -m644 -b -D ncpfs.ko ${MDIR}/kernel/drivers/staging/ncpfs/ncpfs.ko
-	depmod -aq
+	depmod -a
 
 uninstall:
 	rm -rf ${MDIR}/kernel/drivers/staging/ncpfs/ncpfs.ko
-	depmod -aq
+	depmod -a
 
 endif
 

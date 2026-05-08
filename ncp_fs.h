@@ -104,4 +104,7 @@ int ncp_mmap(struct file *, struct vm_area_struct *);
 /* linux/fs/ncpfs/ncplib_kernel.c */
 int ncp_make_closed(struct inode *);
 
+extern struct dentry *ncp_mount_nodev(struct file_system_type *,
+       int, void *, int (*fill_super)(struct super_block *, void *, int));
+
 #include "ncplib_kernel.h"
