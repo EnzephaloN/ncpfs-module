@@ -28,7 +28,9 @@
 #include <linux/vmalloc.h>
 #include <linux/init.h>
 #include <linux/fs.h>
+#include <linux/statfs.h>
 #include <linux/mount.h>
+#include <linux/fs_context.h>
 #include <linux/seq_file.h>
 #include <linux/sched/signal.h>
 #include <linux/namei.h>
@@ -48,6 +50,8 @@ static void ncp_evict_inode(struct inode *);
 static void ncp_put_super(struct super_block *);
 static int  ncp_statfs(struct dentry *, struct kstatfs *);
 static int  ncp_show_options(struct seq_file *, struct dentry *);
+static int  ncp_fill_super(struct super_block *sb, struct fs_context *fc);
+static void delayed_free(struct rcu_head *p);
 
 static struct kmem_cache * ncp_inode_cachep;
 
@@ -102,10 +106,11 @@ static void destroy_inodecache(void)
 	kmem_cache_destroy(ncp_inode_cachep);
 }
 
-static int ncp_remount(struct super_block *sb, int *flags, char* data)
+static int ncp_reconfigure(struct fs_context *fc)
 {
 	sync_filesystem(sb);
-	*flags |= SB_NODIRATIME;
+	fc->sb_flags |= SB_NODIRATIME;
+	fc->sb_flags_mask |= SB_NODIRATIME;
 	return 0;
 }
 
@@ -316,6 +321,7 @@ static void ncp_stop_tasks(struct ncp_server *server) {
 	sk->sk_error_report = server->error_report;
 	sk->sk_data_ready   = server->data_ready;
 	sk->sk_write_space  = server->write_space;
+	sk->sk_user_data    = NULL;
 	release_sock(sk);
 	timer_delete_sync(&server->timeout_tm);
 
@@ -464,8 +470,10 @@ err:
 	return ret;
 }
 
-static int ncp_fill_super(struct super_block *sb, void *raw_data, int silent)
+static int ncp_fill_super(struct super_block *sb, struct fs_context *fc)
 {
+	void *raw_data = fc->fs_private;
+	int silent = !!(fc->sb_flags & SB_SILENT);
 	struct ncp_mount_data_kernel data;
 	struct ncp_server *server;
 	struct inode *root_inode;
@@ -747,7 +755,7 @@ out_fput:
 out:
 	put_pid(data.wdog_pid);
 	sb->s_fs_info = NULL;
-	kfree(server);
+	call_rcu(&server->rcu, delayed_free);
 	return error;
 }
 
@@ -1020,16 +1028,42 @@ out:
 	return result;
 }
 
-static struct dentry *ncp_mount(struct file_system_type *fs_type,
-	int flags, const char *dev_name, void *data)
+static int ncp_parse_monolithic(struct fs_context *fc, void *data)
 {
-	return ncp_mount_nodev(fs_type, flags, data, ncp_fill_super);
+fc->fs_private = data;
+	return 0;
+}
+
+static void ncp_free_fc(struct fs_context *fc)
+{
+	/*
+	 * For legacy mount(2), the VFS owns the monolithic mount-data
+	 * buffer. Do not free fc->fs_private here.
+	 */
+}
+
+static int ncp_get_tree(struct fs_context *fc)
+{
+	return get_tree_nodev(fc, ncp_fill_super);
+}
+
+static const struct fs_context_operations ncp_context_ops = {
+	.free		= ncp_free_fc,
+	.parse_monolithic = ncp_parse_monolithic,
+	.get_tree	= ncp_get_tree,
+	.reconfigure	= ncp_reconfigure,
+};
+
+static int ncp_init_fs_context(struct fs_context *fc)
+{
+	fc->ops = &ncp_context_ops;
+	return 0;
 }
 
 static struct file_system_type ncp_fs_type = {
 	.owner		= THIS_MODULE,
 	.name		= "ncpfs",
-	.mount		= ncp_mount,
+	.init_fs_context = ncp_init_fs_context,
 	.kill_sb	= kill_anon_super,
 	.fs_flags	= FS_BINARY_MOUNTDATA,
 };
@@ -1063,3 +1097,5 @@ static void __exit exit_ncp_fs(void)
 module_init(init_ncp_fs)
 module_exit(exit_ncp_fs)
 MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Johannes C. Schulz (EnzephaloN) <info@enzephalon.de>");
+MODULE_DESCRIPTION("NCP file system support to mount NetWare volumes");
