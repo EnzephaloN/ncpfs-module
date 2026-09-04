@@ -108,6 +108,7 @@ static void destroy_inodecache(void)
 
 static int ncp_reconfigure(struct fs_context *fc)
 {
+	struct super_block *sb = fc->root->d_sb;
 	sync_filesystem(sb);
 	fc->sb_flags |= SB_NODIRATIME;
 	fc->sb_flags_mask |= SB_NODIRATIME;
