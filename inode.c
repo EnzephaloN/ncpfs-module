@@ -123,7 +123,6 @@ static const struct super_operations ncp_sops =
 	.evict_inode	= ncp_evict_inode,
 	.put_super	= ncp_put_super,
 	.statfs		= ncp_statfs,
-	.remount_fs	= ncp_remount,
 	.show_options	= ncp_show_options,
 };
 
